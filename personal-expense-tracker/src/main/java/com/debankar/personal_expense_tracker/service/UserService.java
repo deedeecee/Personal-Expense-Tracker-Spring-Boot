@@ -5,6 +5,7 @@ import com.debankar.personal_expense_tracker.entity.User;
 
 public interface UserService {
     User registerUser(UserCreationDTO userDTO);
-    User authenticate(String email, String password);
+    String authenticate(String email, String password);
     User findByUserId(String userId);
+    User findByEmail(String email);
 }

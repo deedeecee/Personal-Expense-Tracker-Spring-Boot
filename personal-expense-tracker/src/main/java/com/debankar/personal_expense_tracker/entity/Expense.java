@@ -21,9 +21,17 @@ public class Expense {
 
     private String description;
 
-    private double amount;
+    private Double amount;
 
     private LocalDateTime dateTime;
 
     private ObjectId userId;
+
+    public Expense(String category, String description, Double amount, LocalDateTime dateTime, ObjectId userId) {
+        this.category = category;
+        this.description = description;
+        this.amount = amount;
+        this.dateTime = dateTime;
+        this.userId = userId;
+    }
 }

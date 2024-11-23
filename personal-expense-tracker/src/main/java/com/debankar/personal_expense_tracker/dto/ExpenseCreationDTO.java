@@ -19,7 +19,7 @@ public class ExpenseCreationDTO {
 
     @NotNull(message = "Amount is required")
     @Min(value = 0, message = "Amount must be greater than or equal to 0")
-    private double amount;
+    private Double amount;
 
     private LocalDateTime dateTime;
 
