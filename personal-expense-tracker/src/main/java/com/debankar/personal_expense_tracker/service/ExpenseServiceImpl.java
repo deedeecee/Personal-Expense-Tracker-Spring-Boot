@@ -22,7 +22,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public Expense addExpense(String userId, ExpenseCreationDTO expenseDTO) {
+    public Expense addExpense(ExpenseCreationDTO expenseDTO) {
         Expense expense = expenseMapper.toExpense(expenseDTO);
         expense.setDateTime(LocalDateTime.now());
         expenseRepository.save(expense);

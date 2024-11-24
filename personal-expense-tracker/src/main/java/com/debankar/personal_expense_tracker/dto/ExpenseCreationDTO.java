@@ -23,6 +23,5 @@ public class ExpenseCreationDTO {
 
     private LocalDateTime dateTime;
 
-    @NotNull(message = "User ID is required")
     private String userId;
 }
