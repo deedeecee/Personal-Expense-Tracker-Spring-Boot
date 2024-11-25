@@ -4,6 +4,7 @@ import com.debankar.personal_expense_tracker.dto.ExpenseCreationDTO;
 import com.debankar.personal_expense_tracker.dto.ExpenseDTO;
 import com.debankar.personal_expense_tracker.entity.Expense;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ExpenseService {
@@ -11,4 +12,5 @@ public interface ExpenseService {
     List<Expense> getUserExpenses(String userId);
     Expense updateExpense(String expenseId, ExpenseDTO expenseDTO);
     void deleteExpense(String expenseId);
+    double calculateExpensesForPeriod(String userId, LocalDateTime startDate, LocalDateTime endDate);
 }

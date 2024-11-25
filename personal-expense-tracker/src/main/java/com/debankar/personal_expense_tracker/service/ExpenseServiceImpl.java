@@ -67,4 +67,14 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         expenseRepository.deleteById(new ObjectId(expenseId));
     }
+
+    @Override
+    public double calculateExpensesForPeriod(String userId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Expense> expenses = expenseRepository.findByUserIdAndDateTimeBetween(
+                new ObjectId(userId), startDate, endDate);
+
+        return expenses.stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+    }
 }

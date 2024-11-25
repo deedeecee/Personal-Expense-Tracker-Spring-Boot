@@ -17,6 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +36,12 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
 
 
-    public UserController(UserService userService, ExpenseService expenseService, UserMapper userMapper, ExpenseMapper expenseMapper, JwtTokenProvider jwtTokenProvider) {
+    public UserController(
+            UserService userService,
+            ExpenseService expenseService,
+            UserMapper userMapper,
+            ExpenseMapper expenseMapper,
+            JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.expenseService = expenseService;
         this.userMapper = userMapper;
@@ -113,10 +124,44 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping("/weekly-expenses")
+    public ResponseEntity<Double> getWeeklyExpenses(
+            @RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.substring(7);
+        String email = jwtTokenProvider.extractUsername(token);
+
+        User authenticatedUser = userService.findByEmail(email);
+        String authenticatedUserId = authenticatedUser.getId().toString();
+
+        LocalDateTime startOfWeek = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay();
+        LocalDateTime endOfWeek = startOfWeek.plusDays(6).with(LocalTime.MAX);
+
+        double weeklyExpenses = expenseService.calculateExpensesForPeriod(authenticatedUserId, startOfWeek, endOfWeek);
+
+        return ResponseEntity.ok(weeklyExpenses);
+    }
+
+    @GetMapping("/monthly-expenses")
+    public ResponseEntity<Double> getMonthlyExpenses(
+            @RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.substring(7);
+        String email = jwtTokenProvider.extractUsername(token);
+
+        User authenticatedUser = userService.findByEmail(email);
+        String authenticatedUserId = authenticatedUser.getId().toString();
+
+        LocalDateTime startOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+        LocalDateTime endOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
+
+        double monthlyExpenses = expenseService.calculateExpensesForPeriod(authenticatedUserId, startOfMonth, endOfMonth);
+
+        return ResponseEntity.ok(monthlyExpenses);
+    }
+
     @GetMapping("/{userId}")
     public ResponseEntity<UserDTO> getUserById(
             @PathVariable String userId,
-            @RequestHeader("Authorization") String authorizationHeader) {
+            @RequestHeader("Authorization") String authorizationHeader) throws AccessDeniedException {
         String token = authorizationHeader.substring(7);    // removing "Bearer " from header
         String email = jwtTokenProvider.extractUsername(token);
 
@@ -124,7 +169,7 @@ public class UserController {
         boolean isAdmin = authenticatedUser.getRole() == User.Role.ADMIN;
 
         if (!isAdmin && !authenticatedUser.getId().toString().equals(userId)) {
-            throw new IllegalArgumentException("Access denied: You can only view your own details.");
+            throw new AccessDeniedException("Access denied: You can only view your own details.");
         }
 
         User requestedUser = userService.findByUserId(userId);
