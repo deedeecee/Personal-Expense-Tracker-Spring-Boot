@@ -22,6 +22,7 @@ A **Personal Finance Tracker** application built using Spring Boot. This project
   - **Admins**: Manage users and view all user data.
 - **REST API**: Clean and modular API design for seamless integration.
 - **Data Validation**: Validates user inputs using annotations.
+- **Calculate Expenses**: Users can calulate their weekly as well as monthly expenses.
 
 ---
 
